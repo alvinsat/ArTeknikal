@@ -8,10 +8,6 @@ public class ShowReco : MonoBehaviour
     private bool mIsScanning = false;
     private string mTargetMetadata = "";
     public ImageTargetBehaviour ImageTargetTemplate;
-    [SerializeField]
-    UnityEngine.UI.Text txtObjPos;
-    GameObject objs;
-
     // Register cloud reco callbacks
     void Awake()
     {
@@ -21,15 +17,9 @@ public class ShowReco : MonoBehaviour
         mCloudRecoBehaviour.RegisterOnUpdateErrorEventHandler(OnUpdateError);
         mCloudRecoBehaviour.RegisterOnStateChangedEventHandler(OnStateChanged);
         mCloudRecoBehaviour.RegisterOnNewSearchResultEventHandler(OnNewSearchResult);
-        objs = ImageTargetTemplate.transform.GetChild(0).gameObject;
     }
 
 
-    void Update()
-    {
-        txtObjPos.text = objs.transform.position.x.ToString()+ " "
-            + objs.transform.position.y.ToString() + " "+objs.transform.position.z.ToString();
-    }
 
     //Unregister cloud reco callbacks when the handler is destroyed
     void OnDestroy()
