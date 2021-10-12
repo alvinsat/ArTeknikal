@@ -1,0 +1,35 @@
+model detail height control
+model detail fuze box
+model detail remote
+model detail spindle
+model detail-detail include kabel dll
+sys model detail cable pysics
+realistic shading
+anim redone
+
+main menu ui
+audio obj accoustic 3d
+ui detail message
+ui detail message hidden
+ui detail mesage resize
+isolate single view details
+each obj description
+play stop anim
+change anim speed
+
+
+play stop anim with ui text guide
+rotate obj
+remote config locker                                                    
+lighting auto rotate with obj rotate
+
+hide obj if lost focus
+options change ui message image
+options 
+
+[DEBUGGING]
+
+[DONE]
+cloud recognition
+zoom in zoom out
+model detail meja
