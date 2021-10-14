@@ -3,6 +3,7 @@ audio obj accoustic 3d
 ui detail message hidden
 ui detail mesage resize
 isolate single view details
+upgrade model remote untuk ke single detail
 
 play stop anim with ui text guide
 rotate obj
@@ -19,9 +20,10 @@ ui detail message
 play stop anim
 change anim speed
 each obj description
-hide obj if lost focus
+
 
 [DONE]
+hide obj if lost focus
 cloud recognition
 zoom in zoom out
 model detail meja

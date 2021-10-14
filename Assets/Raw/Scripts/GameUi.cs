@@ -54,11 +54,12 @@ public class GameUi : MonoBehaviour
         if (!anim.enabled)
         {
             anim.enabled = true;
+            anim.speed = 1f;
         }
-        if (!isGamePaused)
-        {
-            FiringRayFromScreen();
-        }
+        //if (!isGamePaused)
+        //{
+        //    FiringRayFromScreen();
+        //}
         if (!isGamePaused) {
             if (Input.GetButtonUp("Cancel")) {
                 pausePanel.SetActive(true);
