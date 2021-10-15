@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class GameUi : MonoBehaviour
 {
-
-
     [Header("variable")]
     [Header("Target scale")]
     Vector3 initialScale;
@@ -68,6 +66,14 @@ public class GameUi : MonoBehaviour
         }
     }
 
+
+    public void BtnPauseGame()
+    {
+        pausePanel.SetActive(true);
+        isGamePaused = true;
+        Time.timeScale = 0f;
+    }
+
     public void BtnZoomIn() {
         if (target.transform.localScale.x < maxZoomIn) {
             Vector3 newScale = target.localScale;
@@ -90,6 +96,8 @@ public class GameUi : MonoBehaviour
 
     public void BtnResumeGame() {
         isGamePaused = false;
+        pausePanel.SetActive(false);
+        Time.timeScale = 1f;
     }
 
     public void BtnZoomOutMax() {
@@ -116,18 +124,18 @@ public class GameUi : MonoBehaviour
     }
 
     public void BtnRestartRotation() {
-        transform.rotation = Quaternion.Lerp(transform.rotation, initialRotation, 1f*Time.deltaTime);
+        target.transform.rotation = initialRotation;
     }
 
     public void BtnRotationUp() {
-        float currentYrot = transform.rotation.eulerAngles.y;
+        float currentYrot = target.transform.rotation.eulerAngles.y;
         currentYrot += rotationScale;
-        transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
+        target.transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
     }
     public void BtnRotationDown() {
-        float currentYrot = transform.rotation.eulerAngles.y;
+        float currentYrot = target.transform.rotation.eulerAngles.y;
         currentYrot -= rotationScale;
-        transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
+        target.transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
     }
 
     void FiringRayFromScreen() {
