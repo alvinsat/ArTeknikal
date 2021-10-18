@@ -5,6 +5,9 @@ using UnityEngine;
 public class GameUi : MonoBehaviour
 {
     [Header("variable")]
+    [SerializeField]
+    float timeWaitRay;
+    float timeWaitRayTemp;
     [Header("Target scale")]
     Vector3 initialScale;
     Quaternion initialRotation;
@@ -18,6 +21,7 @@ public class GameUi : MonoBehaviour
 
     [Header("raycast info")]
     [SerializeField]
+    [Tooltip("raycast gameobject. txtNama = gameObject.name.collider")]
     TxtInfo[] infos;
 
     [Header("Komponen")]
@@ -38,6 +42,7 @@ public class GameUi : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        timeWaitRayTemp = timeWaitRay;
         initialScale = target.transform.localScale;
         initialRotation = target.transform.rotation;
         cam = Camera.main;
@@ -54,10 +59,10 @@ public class GameUi : MonoBehaviour
             anim.enabled = true;
             anim.speed = 1f;
         }
-        //if (!isGamePaused)
-        //{
-        //    FiringRayFromScreen();
-        //}
+        if (!isGamePaused)
+        {
+            FiringRayFromScreen();
+        }
         if (!isGamePaused) {
             if (Input.GetButtonUp("Cancel")) {
                 pausePanel.SetActive(true);
@@ -137,13 +142,45 @@ public class GameUi : MonoBehaviour
         currentYrot -= rotationScale;
         target.transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
     }
-
+    [SerializeField]
+    bool isFound = false;
     void FiringRayFromScreen() {
-        ray = cam.ScreenPointToRay(Input.mousePosition);
+        if (!isFound)
+        {
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(1))
+            {
+                ray = cam.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit))
+                {
+                    FindDesc(hit.collider.gameObject.name, out isFound);
+                }
+            }
+        }
+        else
+        {
+            if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
+            {
+                if (timeWaitRay > 0)
+                {
+                    timeWaitRay -= 1f * Time.deltaTime * Time.timeScale;
+                    if (timeWaitRay < 0f)
+                    {
+                        Handheld.Vibrate();
+                        ray = cam.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out hit)) {
-            FindDesc(hit.collider.gameObject.name);
-            Debug.Log("Ray hit "+hit.collider.gameObject.name);
+                        if (Physics.Raycast(ray, out hit))
+                        {
+                            FindDesc(hit.collider.gameObject.name);
+                            Debug.Log("Ray hit " + hit.collider.gameObject.name);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) {
+            timeWaitRay = timeWaitRayTemp;
+            isFound = false;
         }
     }
 
@@ -159,11 +196,29 @@ public class GameUi : MonoBehaviour
             i++;
         }
     }
+
+    void FindDesc(string alias, out bool isFound)
+    {
+        int i = 0;
+        while (i < infos.Length)
+        {
+            if (infos[i].alias == alias)
+            {
+                isFound = true;
+                Debug.Log(alias + " is found");
+
+                return;
+            }
+            i++;
+        }
+        Debug.Log(alias+" is not found");
+        isFound = false;
+    }
 }
 
 [System.Serializable]
 struct TxtInfo{
-    [Tooltip("raycast gameobject. txtNama")]
+
     public string alias;
     public string info;
 }
