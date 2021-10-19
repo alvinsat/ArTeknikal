@@ -7,6 +7,7 @@ public class BtnIsolateHelper : MonoBehaviour
 {
     string targetGameObject;
     GameObject parentObj;
+    GameObject mmain;
     GameUi sysGame;
     // Start is called before the first frame update
     void Start()
@@ -20,22 +21,32 @@ public class BtnIsolateHelper : MonoBehaviour
         
     }
 
-    public void SetTargetObj(string targetName, GameObject parentOb) {
+    public void SetTargetObj(string targetName, GameObject parentOb, GameObject main) {
         targetGameObject = targetName;
         parentObj = parentOb;
+        mmain = main;
     }
 
     public void BtnIsolate() {
+        // Getting another instance with modified structure ARObject
         GameObject a = Instantiate(parentObj);
         parentObj.SetActive(false);
-        Debug.Log("seek target name "+targetGameObject+ " inside "+a.gameObject.name);
+        a.transform.position = mmain.transform.position;
+        a.transform.rotation = mmain.transform.rotation;
+        a.transform.localScale = mmain.transform.localScale;
+        // Trying to find the isolate ARObj and isolate it
         GameObject b = a.transform.Find(targetGameObject).gameObject;
-        Debug.Log("FOUND");
         b = b.GetComponent<ColliderTargetObj>().obj;
         b.transform.SetParent(null);
         sysGame.SetIsolatedObj(b);
+        // Sets the position center of ARWorld
+        b.transform.position = new Vector3(0, 0, 0);
+
+        // clearing the instance
         Destroy(a);
-        b.transform.position = new Vector3(0,0,0);
+        // Hiding the main ARObj
+        mmain.SetActive(false);
+        // Turning this btn off
         gameObject.SetActive(false);
     }
 }

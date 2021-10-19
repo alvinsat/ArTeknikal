@@ -52,6 +52,9 @@ public class GameUi : MonoBehaviour
     [SerializeField]
     GameObject arObj;
     GameObject isolatedObj;
+    Transform initialIsolatedObjData;
+    Vector3 globalScaleIsolated;
+    Vector3 initialRotationIsolated;
     readonly string btnIsolateName = "btnIsolate";
     
     // Start is called before the first frame update
@@ -65,6 +68,9 @@ public class GameUi : MonoBehaviour
 
     public void SetIsolatedObj(GameObject o) {
         isolatedObj = o;
+        initialIsolatedObjData = o.transform;
+        globalScaleIsolated = o.transform.lossyScale;
+        initialRotationIsolated = o.transform.eulerAngles;
     }
 
     public void WhenTracking() {
@@ -105,16 +111,16 @@ public class GameUi : MonoBehaviour
             t.SetActive(false);
         }
 
-        if (isolatedObj)
+        if (isolatedObj !=null)
         {
             Destroy(isolatedObj);
         }
-        else {
-            if (isAlreadyTracking)
-            {
-                arObj.SetActive(true);
-            }
+
+        if (isAlreadyTracking)
+        {
+            arObj.SetActive(true);
         }
+
         anim.speed = 1f;
     }
 
@@ -144,27 +150,10 @@ public class GameUi : MonoBehaviour
     {
         pausePanel.SetActive(true);
         isGamePaused = true;
+        if (tempBtnIsolate) {
+            tempBtnIsolate.SetActive(false);
+        }
         Time.timeScale = 0f;
-    }
-
-    public void BtnZoomIn() {
-        if (target.transform.localScale.x < maxZoomIn) {
-            Vector3 newScale = target.localScale;
-            newScale.x += scaleFactor;
-            newScale.y += scaleFactor;
-            newScale.z += scaleFactor;
-            target.transform.localScale = newScale;
-        }
-    }
-
-    public void BtnZoomOut() {
-        if (target.transform.localScale.x > initialScale.x) {
-            Vector3 newScale = target.localScale;
-            newScale.x -= scaleFactor;
-            newScale.y -= scaleFactor;
-            newScale.z -= scaleFactor;
-            target.transform.localScale = newScale;
-        }
     }
 
     public void BtnResumeGame() {
@@ -173,10 +162,59 @@ public class GameUi : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    public void BtnZoomIn()
+    {
+        if (isolatedObj == null)
+        {
+            if (target.transform.localScale.x < maxZoomIn)
+            {
+                Vector3 newScale = target.localScale;
+                newScale.x += scaleFactor;
+                newScale.y += scaleFactor;
+                newScale.z += scaleFactor;
+                target.transform.localScale = newScale;
+            }
+        }
+        else {
+            Vector3 newScale = isolatedObj.transform.localScale;
+            newScale.x += scaleFactor*3;
+            newScale.y += scaleFactor*3;
+            newScale.z += scaleFactor*3;
+            isolatedObj.transform.localScale = newScale;
+        }
+    }
+
+    public void BtnZoomOut()
+    {
+        if (isolatedObj == null)
+        {
+            if (target.transform.localScale.x > initialScale.x)
+            {
+                Vector3 newScale = target.localScale;
+                newScale.x -= scaleFactor;
+                newScale.y -= scaleFactor;
+                newScale.z -= scaleFactor;
+                target.transform.localScale = newScale;
+            }
+        }
+        else
+        {
+            Vector3 newScale = isolatedObj.transform.localScale;
+            newScale.x -= scaleFactor*3;
+            newScale.y -= scaleFactor*3;
+            newScale.z -= scaleFactor*3;
+            isolatedObj.transform.localScale = newScale;
+        }
+    }
+
     public void BtnZoomOutMax() {
-        // Force zooming out
-        // TODO anim zooming out
-        target.transform.localScale = initialScale;
+        if (isolatedObj == null)
+        {
+            target.transform.localScale = initialScale;
+        }
+        else {
+            isolatedObj.transform.localScale = globalScaleIsolated;
+        }
     }
 
     public void BtnToggleAnim() {
@@ -197,18 +235,40 @@ public class GameUi : MonoBehaviour
     }
 
     public void BtnRestartRotation() {
-        target.transform.rotation = initialRotation;
+        if (isolatedObj == null)
+        {
+            target.transform.rotation = initialRotation;
+        }
+        else {
+            isolatedObj.transform.rotation = Quaternion.Euler(initialRotationIsolated);
+        }
     }
 
     public void BtnRotationUp() {
-        float currentYrot = target.transform.rotation.eulerAngles.y;
-        currentYrot += rotationScale;
-        target.transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
+        if (isolatedObj == null)
+        {
+            float currentYrot = target.transform.rotation.eulerAngles.y;
+            currentYrot += rotationScale;
+            target.transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
+        }
+        else {
+            float currentYrot = isolatedObj.transform.rotation.eulerAngles.y;
+            currentYrot += rotationScale;
+            isolatedObj.transform.rotation = Quaternion.Euler(isolatedObj.transform.rotation.eulerAngles.x, currentYrot, isolatedObj.transform.rotation.eulerAngles.z);
+        }
     }
     public void BtnRotationDown() {
-        float currentYrot = target.transform.rotation.eulerAngles.y;
-        currentYrot -= rotationScale;
-        target.transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
+        if (isolatedObj == null)
+        {
+            float currentYrot = target.transform.rotation.eulerAngles.y;
+            currentYrot -= rotationScale;
+            target.transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
+        }
+        else {
+            float currentYrot = isolatedObj.transform.rotation.eulerAngles.y;
+            currentYrot -= rotationScale;
+            isolatedObj.transform.rotation = Quaternion.Euler(isolatedObj.transform.rotation.eulerAngles.x, currentYrot, isolatedObj.transform.rotation.eulerAngles.z);
+        }
     }
 
     void FiringRayFromScreen() {
@@ -255,7 +315,7 @@ public class GameUi : MonoBehaviour
                                 mPos.z = 0f;
                                 tempBtnIsolate.transform.position = mPos;
                                 tempBtnIsolate.transform.localScale = new Vector3(1f,1f,1f);
-                                tempBtnIsolate.GetComponent<BtnIsolateHelper>().SetTargetObj(hit.collider.gameObject.name, arObjTemplate);
+                                tempBtnIsolate.GetComponent<BtnIsolateHelper>().SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
                             }
                             else {
                                 tempBtnIsolate.SetActive(true);
@@ -263,12 +323,9 @@ public class GameUi : MonoBehaviour
                                 mPos.z = 0f;
                                 tempBtnIsolate.transform.position = mPos;
                                 tempBtnIsolate.transform.localScale = new Vector3(1f, 1f, 1f);
-                                tempBtnIsolate.GetComponent<BtnIsolateHelper>().SetTargetObj(hit.collider.gameObject.name, arObjTemplate);
+                                tempBtnIsolate.GetComponent<BtnIsolateHelper>().SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
                             }
                             anim.speed = 0f;
-                            //TODO set match rotation
-                            //set active only single
-                            //move to center pose
                             //TODO edge aware
                            
                         }

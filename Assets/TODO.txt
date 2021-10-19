@@ -4,24 +4,20 @@ isolate single view details{
   button should edge display aware which allows it to shift if it is around an edge display
 }
 
-upgrade model remote untuk ke single detail
+Credits
+
+Gesture pinch out zoom in, apply in isolate only
+Gesture pinch in zoom out, apply in isolate only
+Gesture 2 finger enters pan XY mode, apply in isolate only
+Gesture 3 finger hold drag rotate, apply in isolate only
 
 Options
- Credits
- Tap hold sensitivity
  Show FPS
+ Tap hold sensitivity
  Pinch sensitivity
- 
-
-Gesture pinch out zoom in
-Gesture pinch in zoom out
-Gesture 2 finger enters pan XY mode
-Gesture 3 finger hold drag rotate
-Gesture double tap fast pause anim
-
-Carousel loading info add more images
 
 [DEBUGGING]
+Carousel loading info add more images
 Resume all state if refocus
 Force resume anim if redetect
 isolate single view details{
@@ -34,6 +30,7 @@ if button is pressed then
  copy ARObj and it's rotation
  setactive only selected obj
 }
+upgrade model remote untuk ke single detail
 
 [DONE]
 anim redone
@@ -53,13 +50,9 @@ model detail remote
 model detail spindle
 realistic shading
 
-
-
-
 [HOWTO]
 void HandleTouch() {
         switch(Input.touchCount) {
-    
         case 1: // Panning
             wasZoomingLastFrame = false;
             
@@ -87,11 +80,10 @@ void HandleTouch() {
                 float offset = newDistance - oldDistance;
     
                 ZoomCamera(offset, ZoomSpeedTouch);
-    
+
                 lastZoomPositions = newPositions;
             }
-            break;
-            
+            break;            
         default: 
             wasZoomingLastFrame = false;
             break;
