@@ -1,18 +1,41 @@
-audio obj accoustic 3d
+upgrade anim to timeline so it supports audio.. but did timeline support audio pause by default ?
 
-ui detail message hidden
-ui detail mesage resize
-isolate single view details
+isolate single view details{
+  button should edge display aware which allows it to shift if it is around an edge display
+}
+
 upgrade model remote untuk ke single detail
 
-play stop anim with ui text guide
-rotate obj
-remote config Desc 
+Options
+ Credits
+ Tap hold sensitivity
+ Show FPS
+ Pinch sensitivity
+ 
 
-options change ui message image
-options 
+Gesture pinch out zoom in
+Gesture pinch in zoom out
+Gesture 2 finger enters pan XY mode
+Gesture 3 finger hold drag rotate
+Gesture double tap fast pause anim
+
+Carousel loading info add more images
 
 [DEBUGGING]
+Resume all state if refocus
+Force resume anim if redetect
+isolate single view details{
+show button if hold single obj done
+pause anim
+if tap anywhere but not UI dissolve this button
+if tap X in ui dissolve button
+if button is pressed then
+ hide actual ARObj
+ copy ARObj and it's rotation
+ setactive only selected obj
+}
+
+[DONE]
 anim redone
 model detail-detail include kabel dll
 main menu ui
@@ -20,9 +43,6 @@ ui detail message
 play stop anim
 change anim speed
 each obj description
-
-
-[DONE]
 hide obj if lost focus
 cloud recognition
 zoom in zoom out
@@ -32,3 +52,48 @@ model detail fuze box
 model detail remote
 model detail spindle
 realistic shading
+
+
+
+
+[HOWTO]
+void HandleTouch() {
+        switch(Input.touchCount) {
+    
+        case 1: // Panning
+            wasZoomingLastFrame = false;
+            
+            // If the touch began, capture its position and its finger ID.
+            // Otherwise, if the finger ID of the touch doesn't match, skip it.
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Began) {
+                lastPanPosition = touch.position;
+                panFingerId = touch.fingerId;
+            } else if (touch.fingerId == panFingerId && touch.phase == TouchPhase.Moved) {
+                PanCamera(touch.position);
+            }
+            break;
+    
+        case 2: // Zooming
+            Vector2[] newPositions = new Vector2[]{Input.GetTouch(0).position, Input.GetTouch(1).position};
+            if (!wasZoomingLastFrame) {
+                lastZoomPositions = newPositions;
+                wasZoomingLastFrame = true;
+            } else {
+                // Zoom based on the distance between the new positions compared to the 
+                // distance between the previous positions.
+                float newDistance = Vector2.Distance(newPositions[0], newPositions[1]);
+                float oldDistance = Vector2.Distance(lastZoomPositions[0], lastZoomPositions[1]);
+                float offset = newDistance - oldDistance;
+    
+                ZoomCamera(offset, ZoomSpeedTouch);
+    
+                lastZoomPositions = newPositions;
+            }
+            break;
+            
+        default: 
+            wasZoomingLastFrame = false;
+            break;
+        }
+    }

@@ -18,6 +18,15 @@ public class GameUi : MonoBehaviour
     [SerializeField]
     float rotationScale;
     bool isGamePaused;
+    bool isFound = false;
+    [SerializeField]
+    float btnIsolateSize;
+    [SerializeField]
+    GameObject btnIsolate;
+    [SerializeField]
+    Transform uiCanvas;
+    GameObject tempBtnIsolate;
+    bool isAlreadyTracking;
 
     [Header("raycast info")]
     [SerializeField]
@@ -38,7 +47,13 @@ public class GameUi : MonoBehaviour
     GameObject pausePanel;
     [SerializeField]
     TMPro.TextMeshProUGUI txtDesc;
-
+    [SerializeField]
+    GameObject arObjTemplate;
+    [SerializeField]
+    GameObject arObj;
+    GameObject isolatedObj;
+    readonly string btnIsolateName = "btnIsolate";
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -48,7 +63,60 @@ public class GameUi : MonoBehaviour
         cam = Camera.main;
     }
 
+    public void SetIsolatedObj(GameObject o) {
+        isolatedObj = o;
+    }
 
+    public void WhenTracking() {
+        if (!isAlreadyTracking)
+        {
+            // TODO resume last
+            if (isolatedObj)
+            {
+                isolatedObj.SetActive(true);
+            }
+            else {
+                arObj.SetActive(true);
+            }
+            isAlreadyTracking = true;
+        }
+    }
+
+    public void LostTracking() {
+        if (isolatedObj)
+        {
+            isolatedObj.SetActive(false);
+            GameObject t;
+            t = GameObject.Find(btnIsolateName);
+            if (t) {
+                t.SetActive(false);
+            }
+        }
+        else {
+            arObj.SetActive(false);
+        }
+        isAlreadyTracking = false;
+    }
+
+    public void BtnDissolveIsolate() {
+        GameObject t;
+        t = GameObject.Find(btnIsolateName);
+        if (t) {
+            t.SetActive(false);
+        }
+
+        if (isolatedObj)
+        {
+            Destroy(isolatedObj);
+        }
+        else {
+            if (isAlreadyTracking)
+            {
+                arObj.SetActive(true);
+            }
+        }
+        anim.speed = 1f;
+    }
 
     // Update is called once per frame
     void Update()
@@ -142,9 +210,9 @@ public class GameUi : MonoBehaviour
         currentYrot -= rotationScale;
         target.transform.rotation = Quaternion.Euler(0f, currentYrot, 0f);
     }
-    [SerializeField]
-    bool isFound = false;
+
     void FiringRayFromScreen() {
+        //if(Event)
         if (!isFound)
         {
             if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(1))
@@ -153,6 +221,12 @@ public class GameUi : MonoBehaviour
                 if (Physics.Raycast(ray, out hit))
                 {
                     FindDesc(hit.collider.gameObject.name, out isFound);
+                }
+
+                if (!isFound) {
+                    if (tempBtnIsolate != null) {
+                        tempBtnIsolate.SetActive(false);
+                    }
                 }
             }
         }
@@ -167,11 +241,36 @@ public class GameUi : MonoBehaviour
                     {
                         Handheld.Vibrate();
                         ray = cam.ScreenPointToRay(Input.mousePosition);
-
+                        
                         if (Physics.Raycast(ray, out hit))
                         {
                             FindDesc(hit.collider.gameObject.name);
-                            Debug.Log("Ray hit " + hit.collider.gameObject.name);
+                            //Debug.Log("Ray hit " + hit.collider.gameObject.name);
+                            if (tempBtnIsolate == null)
+                            {
+                                tempBtnIsolate = Instantiate(btnIsolate);
+                                tempBtnIsolate.name = btnIsolateName;
+                                tempBtnIsolate.transform.SetParent(uiCanvas);
+                                Vector3 mPos = tempBtnIsolate.transform.position = cam.WorldToScreenPoint(hit.point);
+                                mPos.z = 0f;
+                                tempBtnIsolate.transform.position = mPos;
+                                tempBtnIsolate.transform.localScale = new Vector3(1f,1f,1f);
+                                tempBtnIsolate.GetComponent<BtnIsolateHelper>().SetTargetObj(hit.collider.gameObject.name, arObjTemplate);
+                            }
+                            else {
+                                tempBtnIsolate.SetActive(true);
+                                Vector3 mPos = tempBtnIsolate.transform.position = cam.WorldToScreenPoint(hit.point);
+                                mPos.z = 0f;
+                                tempBtnIsolate.transform.position = mPos;
+                                tempBtnIsolate.transform.localScale = new Vector3(1f, 1f, 1f);
+                                tempBtnIsolate.GetComponent<BtnIsolateHelper>().SetTargetObj(hit.collider.gameObject.name, arObjTemplate);
+                            }
+                            anim.speed = 0f;
+                            //TODO set match rotation
+                            //set active only single
+                            //move to center pose
+                            //TODO edge aware
+                           
                         }
                     }
                 }
@@ -195,6 +294,10 @@ public class GameUi : MonoBehaviour
             }
             i++;
         }
+    }
+
+    public void ForceResumeAnim() {
+        anim.speed = 1f;
     }
 
     void FindDesc(string alias, out bool isFound)
