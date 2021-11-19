@@ -1,10 +1,14 @@
+More descriptive in loading
+Add save to file the screen image target.. use resource folder.. possibly .doc or .png / .jpg
+
+
+upgrade to vuforia 9.8
 upgrade anim to timeline so it supports audio.. but did timeline support audio pause by default ?
 
-isolate single view details{
+isolate single view details {
   button should edge display aware which allows it to shift if it is around an edge display
 }
 
-Credits
 
 Gesture pinch out zoom in, apply in isolate only
 Gesture pinch in zoom out, apply in isolate only
@@ -17,6 +21,10 @@ Options
  Pinch sensitivity
 
 [DEBUGGING]
+Restructure Main Menu : make horizontal.. add credits button add close button
+Pin the green button to target obj
+Description as scroll bar
+swap exclamation color with close color
 Carousel loading info add more images
 Resume all state if refocus
 Force resume anim if redetect

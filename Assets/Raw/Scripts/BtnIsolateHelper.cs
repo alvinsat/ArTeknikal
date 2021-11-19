@@ -9,18 +9,42 @@ public class BtnIsolateHelper : MonoBehaviour
     GameObject parentObj;
     GameObject mmain;
     GameUi sysGame;
+    Vector3 trackedPos;
+    Camera cam;
     // Start is called before the first frame update
     void Start()
     {
         sysGame = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameUi>();
+        cam = Camera.main;
+    }
+    /// <summary>
+    /// Sets the selected touch point as tracked
+    /// </summary>
+    /// <param name="poss"></param>
+    public void SetTrackedPos(Vector3 poss) {
+        trackedPos = poss;
+    }
+
+    /// <summary>
+    /// Transform from trancked world pos to screenpos
+    /// </summary>
+    void TrackSavedPosInScreenSpace() {
+        Vector3 mPos = transform.position = cam.WorldToScreenPoint(trackedPos);
+        mPos.z = 0f;
+        transform.position = mPos;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        TrackSavedPosInScreenSpace();// This operation might heavy, consider update it on every few frame only
     }
-
+    /// <summary>
+    /// Sets target isolated obj
+    /// </summary>
+    /// <param name="targetName"> selected name </param>
+    /// <param name="parentOb"> parent of this ARObj </param>
+    /// <param name="main"></param>
     public void SetTargetObj(string targetName, GameObject parentOb, GameObject main) {
         targetGameObject = targetName;
         parentObj = parentOb;

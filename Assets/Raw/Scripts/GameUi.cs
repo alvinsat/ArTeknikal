@@ -8,6 +8,7 @@ public class GameUi : MonoBehaviour
     [SerializeField]
     float timeWaitRay;
     float timeWaitRayTemp;
+
     [Header("Target scale")]
     Vector3 initialScale;
     Quaternion initialRotation;
@@ -48,6 +49,8 @@ public class GameUi : MonoBehaviour
     [SerializeField]
     TMPro.TextMeshProUGUI txtDesc;
     [SerializeField]
+    GameObject objTemplateTxt;
+    [SerializeField]
     GameObject arObjTemplate;
     [SerializeField]
     GameObject arObj;
@@ -64,6 +67,7 @@ public class GameUi : MonoBehaviour
         initialScale = target.transform.localScale;
         initialRotation = target.transform.rotation;
         cam = Camera.main;
+        InitScrollBarText();
     }
 
     public void SetIsolatedObj(GameObject o) {
@@ -315,7 +319,9 @@ public class GameUi : MonoBehaviour
                                 mPos.z = 0f;
                                 tempBtnIsolate.transform.position = mPos;
                                 tempBtnIsolate.transform.localScale = new Vector3(1f,1f,1f);
-                                tempBtnIsolate.GetComponent<BtnIsolateHelper>().SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
+                                BtnIsolateHelper btn = tempBtnIsolate.GetComponent<BtnIsolateHelper>();
+                                btn.SetTrackedPos(hit.point);
+                                btn.SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
                             }
                             else {
                                 tempBtnIsolate.SetActive(true);
@@ -323,11 +329,12 @@ public class GameUi : MonoBehaviour
                                 mPos.z = 0f;
                                 tempBtnIsolate.transform.position = mPos;
                                 tempBtnIsolate.transform.localScale = new Vector3(1f, 1f, 1f);
-                                tempBtnIsolate.GetComponent<BtnIsolateHelper>().SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
+                                BtnIsolateHelper btn = tempBtnIsolate.GetComponent<BtnIsolateHelper>();
+                                btn.SetTrackedPos(hit.point);
+                                btn.SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
                             }
                             anim.speed = 0f;
                             //TODO edge aware
-                           
                         }
                     }
                 }
@@ -340,6 +347,10 @@ public class GameUi : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Find if description exists then draw it if it is
+    /// </summary>
+    /// <param name="alias"> gameObject name = List<Desc> </param>
     void FindDesc(string alias) {
         int i = 0;
         while (i < infos.Length) {
@@ -347,10 +358,69 @@ public class GameUi : MonoBehaviour
                 if (!panelKetView.activeInHierarchy) {
                     panelKetView.SetActive(true);
                 }
-                txtDesc.SetText(infos[i].info);
+                //txtDesc.SetText(infos[i].info);
+                AddTextToScrollBar(infos[i].info);
             }
             i++;
         }
+    }
+
+    void AddTextToScrollBar(string slx) {
+        // Prepare the Obj
+        int mxq = txtDescList.Count;
+        int i = 0;
+        if (mxq > 0) {
+            i = 0;
+            while (i < mxq) {
+                Destroy(txtDescList[i]);
+                i++;
+            }
+            txtDescList.Clear();
+        }
+        // split the string into parts where is <= maxCharInScrollBar
+        GameObject o;
+        // determine how many loop
+        i = 0;
+        int calc = slx.Length;
+        while (calc > 0) {
+            calc -= maxCharInScrollBar;
+            mxq++;
+        }
+        //
+        i = 0;
+        //int txtLeftLength = slx.Length;// decrease this each loop step based on slx.length
+        int nowAt = 0;// increse this every loop step as a resume starting position of a text
+        while (i < mxq) {
+            o = Instantiate(objTemplateTxt, objTemplateTxt.transform.parent);
+            if (i != mxq-1)
+            {
+                o.GetComponent<TMPro.TextMeshProUGUI>().SetText(slx.Substring(nowAt, maxCharInScrollBar));
+                txtDescList.Add(o);
+                o.SetActive(true);
+                nowAt += maxCharInScrollBar;
+
+            }
+            else if(i == mxq-1) { 
+                o.GetComponent<TMPro.TextMeshProUGUI>().SetText(slx.Substring(nowAt, slx.Length%maxCharInScrollBar));
+                txtDescList.Add(o);
+                o.SetActive(true);
+                nowAt += maxCharInScrollBar;
+
+            }
+            i++;
+        }
+    }
+
+    int maxCharInScrollBar;
+    List<GameObject> txtDescList;
+    /// <summary>
+    /// Call to init the scroll bar text
+    /// </summary>
+    void InitScrollBarText() {
+        // prepare the list that can be use as text info placeholder
+        txtDescList = new List<GameObject>();
+        // Find maximum length that the design accept
+        maxCharInScrollBar = objTemplateTxt.GetComponent<TMPro.TextMeshProUGUI>().text.Length;
     }
 
     public void ForceResumeAnim() {
