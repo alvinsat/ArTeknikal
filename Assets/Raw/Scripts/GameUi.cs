@@ -279,11 +279,13 @@ public class GameUi : MonoBehaviour
         //if(Event)
         if (!isFound)
         {
+            // if the button is not visible or never created in a few frame
             if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(1))
             {
                 ray = cam.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit))
                 {
+                    // okay am I find the correct data ?
                     FindDesc(hit.collider.gameObject.name, out isFound);
                 }
 
@@ -305,7 +307,7 @@ public class GameUi : MonoBehaviour
                     {
                         Handheld.Vibrate();
                         ray = cam.ScreenPointToRay(Input.mousePosition);
-                        
+
                         if (Physics.Raycast(ray, out hit))
                         {
                             FindDesc(hit.collider.gameObject.name);
@@ -318,23 +320,30 @@ public class GameUi : MonoBehaviour
                                 Vector3 mPos = tempBtnIsolate.transform.position = cam.WorldToScreenPoint(hit.point);
                                 mPos.z = 0f;
                                 tempBtnIsolate.transform.position = mPos;
-                                tempBtnIsolate.transform.localScale = new Vector3(1f,1f,1f);
+                                tempBtnIsolate.transform.localScale = new Vector3(1f, 1f, 1f);
                                 BtnIsolateHelper btn = tempBtnIsolate.GetComponent<BtnIsolateHelper>();
-                                btn.SetTrackedPos(hit.point);
                                 btn.SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
+                                btn.SetTrackedPos(hit.point);
                             }
-                            else {
+                            else
+                            {
                                 tempBtnIsolate.SetActive(true);
                                 Vector3 mPos = tempBtnIsolate.transform.position = cam.WorldToScreenPoint(hit.point);
                                 mPos.z = 0f;
                                 tempBtnIsolate.transform.position = mPos;
                                 tempBtnIsolate.transform.localScale = new Vector3(1f, 1f, 1f);
                                 BtnIsolateHelper btn = tempBtnIsolate.GetComponent<BtnIsolateHelper>();
-                                btn.SetTrackedPos(hit.point);
                                 btn.SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
+                                btn.SetTrackedPos(hit.point);
                             }
                             anim.speed = 0f;
                             //TODO edge aware
+                        }
+                        else {
+                            if (tempBtnIsolate) {
+                                tempBtnIsolate.SetActive(false);
+                            }
+                            anim.speed = 1f;
                         }
                     }
                 }
@@ -367,12 +376,12 @@ public class GameUi : MonoBehaviour
 
     void AddTextToScrollBar(string slx) {
         // Prepare the Obj
-        int mxq = txtDescList.Count;
+        int mxq = txtDescList.Count;// this var is reuable that acts as a counter
         int i = 0;
         if (mxq > 0) {
             i = 0;
             while (i < mxq) {
-                Destroy(txtDescList[i]);
+                Destroy(txtDescList[i]);// clearing data before this
                 i++;
             }
             txtDescList.Clear();
@@ -382,6 +391,7 @@ public class GameUi : MonoBehaviour
         // determine how many loop
         i = 0;
         int calc = slx.Length;
+        mxq = 0;
         while (calc > 0) {
             calc -= maxCharInScrollBar;
             mxq++;
@@ -392,21 +402,32 @@ public class GameUi : MonoBehaviour
         int nowAt = 0;// increse this every loop step as a resume starting position of a text
         while (i < mxq) {
             o = Instantiate(objTemplateTxt, objTemplateTxt.transform.parent);
-            if (i != mxq-1)
+            if (slx.Length > maxCharInScrollBar)
             {
-                o.GetComponent<TMPro.TextMeshProUGUI>().SetText(slx.Substring(nowAt, maxCharInScrollBar));
+                if (i != mxq - 1)
+                {
+                    o.GetComponent<TMPro.TextMeshProUGUI>().SetText(slx.Substring(nowAt, maxCharInScrollBar));
+                    txtDescList.Add(o);
+                    o.SetActive(true);
+                    nowAt += maxCharInScrollBar;
+
+                }
+                else if (i == mxq - 1)
+                {
+                    o.GetComponent<TMPro.TextMeshProUGUI>().SetText(slx.Substring(nowAt, slx.Length % maxCharInScrollBar));
+                    txtDescList.Add(o);
+                    o.SetActive(true);
+                    nowAt += maxCharInScrollBar;
+
+                }
+            }
+            else {
+                o.GetComponent<TMPro.TextMeshProUGUI>().SetText(slx);
                 txtDescList.Add(o);
                 o.SetActive(true);
-                nowAt += maxCharInScrollBar;
-
+                //nowAt += maxCharInScrollBar;
             }
-            else if(i == mxq-1) { 
-                o.GetComponent<TMPro.TextMeshProUGUI>().SetText(slx.Substring(nowAt, slx.Length%maxCharInScrollBar));
-                txtDescList.Add(o);
-                o.SetActive(true);
-                nowAt += maxCharInScrollBar;
 
-            }
             i++;
         }
     }
