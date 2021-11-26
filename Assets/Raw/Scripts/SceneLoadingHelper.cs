@@ -14,11 +14,15 @@ public class SceneLoadingHelper : MonoBehaviour
     GameObject btnReadyScene;
     AsyncOperation asyncSync;
     bool isLoading;
+    bool isLoadingWithAnim;
+    GameObject animLoading;
 
     // Start is called before the first frame update
     void Start()
     {
-        btnReadyScene.SetActive(false);
+        if (btnReadyScene) { 
+            btnReadyScene.SetActive(false);
+        }
     }
 
     // Update is called once per frame
@@ -29,15 +33,24 @@ public class SceneLoadingHelper : MonoBehaviour
             StartCoroutine(LoadScene());
             isLoading = false;
         }
+
+        if (isLoadingWithAnim) {
+            animLoading.SetActive(true);
+            StartCoroutine(LoadScene(true));
+            isLoadingWithAnim = false;
+        }
     }
 
     public void BtnSetSceneName(string alias) {
         sceneName = alias;
     }
     
-    
     public void BtnStartLoadingScene() {
         isLoading = true;
+    }
+
+    public void BtnStarLoadingWithAnim() {
+        isLoadingWithAnim = true;
     }
 
 
@@ -55,6 +68,28 @@ public class SceneLoadingHelper : MonoBehaviour
                 asyncSync = asyncLoad;
                 btnReadyScene.SetActive(true);
                 imgLoading.gameObject.SetActive(false);
+            }
+            yield return null;
+        }
+    }
+
+    public void BtnSetLoadingAnimObj(GameObject o) {
+        animLoading = o;
+    }
+
+    IEnumerator LoadScene(bool isHasAnimLoading) {
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        asyncLoad.allowSceneActivation = true;
+        while (!asyncLoad.isDone) {
+            //imgLoading.fillAmount = asyncLoad.progress;
+            if (asyncLoad.progress <= 0.9f)
+            {
+                //asyncSync = asyncLoad;
+                //btnReadyScene.SetActive(true);
+                //imgLoading.gameObject.SetActive(false);
+                if (!animLoading.activeInHierarchy) {
+                    animLoading.SetActive(true);
+                }
             }
             yield return null;
         }

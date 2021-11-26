@@ -1,6 +1,5 @@
-More descriptive in loading
-Add save to file the screen image target.. use resource folder.. possibly .doc or .png / .jpg
-
+Cannot recover to normal state after lost focus in isolate mode why ?
+Cannot recover to normal state after lost focus in showing isolate mode why ?
 
 upgrade to vuforia 9.8
 upgrade anim to timeline so it supports audio.. but did timeline support audio pause by default ?
@@ -8,7 +7,6 @@ upgrade anim to timeline so it supports audio.. but did timeline support audio p
 isolate single view details {
   button should edge display aware which allows it to shift if it is around an edge display
 }
-
 
 Gesture pinch out zoom in, apply in isolate only
 Gesture pinch in zoom out, apply in isolate only
@@ -21,17 +19,30 @@ Options
  Pinch sensitivity
 
 [DEBUGGING]
+instruksi kayak lihat image target :
+1. alur harus apa aja
+lihat beneran kayak design e pak avas
+keterangan desc dikecilin
+HUD gamescene : tengah pause anim, pojok pause manu
+credits pop up harus solid
+posisi tombol unduh proporsi
+close dikanan atas kecil
+cnc gambar tengah
+More descriptive in loading
+use open url in downloading marker
 Restructure Main Menu : make horizontal.. add credits button add close button
 Pin the green button to target obj
+
+[DONE]
+New UI desc on loading
+Instruksi loading gambar jelas harus HUD, tentang scanner, 
 Description as scroll bar
 swap exclamation color with close color
 Carousel loading info add more images
 Resume all state if refocus
 Force resume anim if redetect
 isolate single view details{
-show button if hold single obj done
-pause anim
-if tap anywhere but not UI dissolve this button
+
 if tap X in ui dissolve button
 if button is pressed then
  hide actual ARObj
@@ -39,8 +50,10 @@ if button is pressed then
  setactive only selected obj
 }
 upgrade model remote untuk ke single detail
+show button if hold single obj done
+pause anim
+if tap anywhere but not UI dissolve this button
 
-[DONE]
 anim redone
 model detail-detail include kabel dll
 main menu ui
@@ -59,6 +72,7 @@ model detail spindle
 realistic shading
 
 [HOWTO]
+Gesture-
 void HandleTouch() {
         switch(Input.touchCount) {
         case 1: // Panning

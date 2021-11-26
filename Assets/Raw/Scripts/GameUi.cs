@@ -46,8 +46,8 @@ public class GameUi : MonoBehaviour
     GameObject panelKetView;
     [SerializeField]
     GameObject pausePanel;
-    [SerializeField]
-    TMPro.TextMeshProUGUI txtDesc;
+    //[SerializeField]
+    //TMPro.TextMeshProUGUI txtDesc;
     [SerializeField]
     GameObject objTemplateTxt;
     [SerializeField]
@@ -59,7 +59,8 @@ public class GameUi : MonoBehaviour
     Vector3 globalScaleIsolated;
     Vector3 initialRotationIsolated;
     readonly string btnIsolateName = "btnIsolate";
-    
+    BtnToggleObj objToggle;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -68,6 +69,8 @@ public class GameUi : MonoBehaviour
         initialRotation = target.transform.rotation;
         cam = Camera.main;
         InitScrollBarText();
+        Time.timeScale = 1f;// Sometimes when entering new scene time scale is always reset
+        objToggle = GameObject.Find("btnPauseAnim").GetComponent<BtnToggleObj>();
     }
 
     public void SetIsolatedObj(GameObject o) {
@@ -137,10 +140,12 @@ public class GameUi : MonoBehaviour
             anim.enabled = true;
             anim.speed = 1f;
         }
+
         if (!isGamePaused)
         {
             FiringRayFromScreen();
         }
+
         if (!isGamePaused) {
             if (Input.GetButtonUp("Cancel")) {
                 pausePanel.SetActive(true);
@@ -289,11 +294,12 @@ public class GameUi : MonoBehaviour
                     FindDesc(hit.collider.gameObject.name, out isFound);
                 }
 
-                if (!isFound) {
-                    if (tempBtnIsolate != null) {
-                        tempBtnIsolate.SetActive(false);
-                    }
-                }
+                // Hides Isolate button if tap an empty area
+                //if (!isFound) {
+                //    if (tempBtnIsolate != null) {
+                //        tempBtnIsolate.SetActive(false);
+                //    }
+                //}
             }
         }
         else
@@ -324,9 +330,11 @@ public class GameUi : MonoBehaviour
                                 BtnIsolateHelper btn = tempBtnIsolate.GetComponent<BtnIsolateHelper>();
                                 btn.SetTargetObj(hit.collider.gameObject.name, arObjTemplate, arObj);
                                 btn.SetTrackedPos(hit.point);
+                                //objToggle.BtnToggle();
                             }
                             else
                             {
+                                //objToggle.BtnToggle();
                                 tempBtnIsolate.SetActive(true);
                                 Vector3 mPos = tempBtnIsolate.transform.position = cam.WorldToScreenPoint(hit.point);
                                 mPos.z = 0f;
